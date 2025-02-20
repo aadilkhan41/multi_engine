@@ -1,3 +1,23 @@
+let id;
+let users = JSON.parse(localStorage.getItem("users"));
+window.addEventListener("load", function(){
+    let log = users.filter((ele) => {
+        return ele.status == 'logged in';
+    });
+
+    id = log[0].id;
+    renderHistory();
+});
+
+function renderHistory(){
+    let historyObj = document.querySelector("#history");
+    historyObj.innerHTML = '';
+    users[id].history.forEach(ele=>{
+        let temp = `<p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">${ele}</p>`;
+        historyObj.innerHTML += temp;
+    });
+}
+
 // Google Search API
 const SEARCH_API_KEY = "AIzaSyBChQKhWne8R9TdgG5yjyaB6vgQkwPTQeM";
 const CX = "16e53c083a9614b20";
@@ -7,17 +27,81 @@ async function googleSearch(searchQuery){
         let res = await fetch(`https://www.googleapis.com/customsearch/v1?q=${searchQuery}&key=${SEARCH_API_KEY}&cx=${CX}`);
         let data = await res.json();
 
+        users[id].history.push(searchQuery);
+        localStorage.setItem("users", JSON.stringify(users));
+        renderHistory();
+
+        let section = document.querySelector(".container section");
+        section.innerHTML = "";
         data.items.forEach(element => {
-            console.log("Title: "+element.title);
-            console.log("Title Link: "+element.displayLink);
-            console.log("Link: "+element.link);
-            console.log("Description: "+element.htmlSnippet);
-            let thumbnail = element.pagemap?.cse_thumbnail != undefined ? element.pagemap?.cse_thumbnail[0].src : '/assets/logo.png';
-            console.log("Thumbnail: "+thumbnail);
-            console.log("");
+            let thumbnail = element.pagemap?.cse_thumbnail != undefined ? element.pagemap?.cse_thumbnail[0].src : './globe.svg';
+            let temp = `
+            <div class="p-[15px] rounded-[10px] mb-[10px] bg-[#303030]">
+                <a href="${element.link}" target="_blank">
+                    <div class="flex items-center">
+                        <span><img class="w-[30px] h-[30px] rounded-full p-[5px] bg-white" src="${thumbnail}" alt=""></span>
+                        <span>
+                            <h2 class="text-[15px] font-medium pl-[10px]">${element.displayLink}</h2>
+                            <h3 class="text-[12px] pl-[10px]">${element.link}</h3>
+                        </span>
+                    </div>
+                    <h4 class="text-[#7BA3F8] py-[5px] text-[18px] font-medium">${element.title}</h4>
+                    <p class="text-[15px]">${element.htmlSnippet}</p>
+                </a>
+            </div>`;
+            section.innerHTML += temp;
         });
     }catch(error){
-        console.log(error);
+        document.querySelector(".container section").innerHTML = `<h1 class="w-full text-[18px] font-semibold text-center mb-[20px]">There seems to be an issue. Please try again later.</h1>`;
+    }
+}
+
+// Wiki Search API
+async function wikiSearch(query) {
+    try{
+        const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${query}&format=json&origin=*`);
+        const data = await response.json(); 
+        let resultData = data.query.search.map((result)=>{
+            return result;
+        });
+
+        users[id].history.push(query);
+        localStorage.setItem("users", JSON.stringify(users));
+        renderHistory();
+
+        let section = document.querySelector(".container section");
+        section.innerHTML = "";
+        resultData.forEach(async (result) => {
+            const title = result.title;
+            const imageResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${title}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
+            const imageData = await imageResponse.json();
+            const pageId = result.pageid;
+
+            let imageUrl = 'user.png';
+            if(imageData.query.pages[pageId].thumbnail){
+                imageUrl = imageData.query.pages[pageId].thumbnail.source;
+            }
+
+            let link = `https://en.wikipedia.org/wiki/${title.replace(/ /g, "_")}`;           
+
+            let temp = `
+            <div class="p-[15px] rounded-[10px] mb-[10px] bg-[#303030]">
+                <a href="${link}">
+                    <div class="grid grid-cols-[80px_auto]">
+                        <span class="w-[80px] h-[80px]">
+                            <img class="w-full h-full rounded-full bg-white object-cover" src="${imageUrl}" alt="">
+                        </span>
+                        <span>
+                            <h2 class="text-[16px] font-medium pl-[10px]">${title}</h2>
+                            <h3 class="text-[15px] pl-[10px]">${result.snippet}</h3>
+                        </span>
+                    </div>
+                </a>
+            </div>`;
+            section.innerHTML += temp;
+        });
+    }catch(error){
+        document.querySelector(".container section").innerHTML = `<h1 class="w-full text-[18px] font-semibold text-center mb-[20px]">There seems to be an issue. Please try again later.</h1>`;
     }
 }
 
@@ -27,48 +111,21 @@ import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
 const genAI = new GoogleGenerativeAI(GEMINI_API_Key);
 
 async function googleGemini(prompt) {
-    if(prompt === "") return;
     try{
         const model = genAI.getGenerativeModel({ model: "gemini-pro"});
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text();
-    
-        document.querySelector("body").innerHTML = marked.parse(text);
+        const text = marked.parse(response.text());
+
+        users[id].history.push(prompt);
+        localStorage.setItem("users", JSON.stringify(users));
+        renderHistory();
+
+        let section = document.querySelector(".container section");
+        section.innerHTML = text;
     }catch(error){
-        console.log(error);
+        document.querySelector(".container section").innerHTML = `<h1 class="w-full text-[18px] font-semibold text-center mb-[20px]">There seems to be an issue. Please try again later.</h1>`;
     }
-}
-
-// Wiki Search API
-async function wikiSearch(query) {
-    if(query === "") return;
-
-    const response = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${query}&format=json&origin=*`);
-    const data = await response.json(); 
-    let resultData = data.query.search.map((result)=>{
-        return result;
-    });
-
-    resultData.forEach(async (result) => {
-        const title = result.title;
-        const imageResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${title}&prop=pageimages&format=json&pithumbsize=500&origin=*`);
-        const imageData = await imageResponse.json();
-        const pageId = result.pageid;
-
-        if (imageData.query.pages[pageId].thumbnail) {
-            const imageUrl = imageData.query.pages[pageId].thumbnail.source;
-            console.log("Profile Picture:", imageUrl);
-        } else {
-            console.log("No profile picture found");
-        }
-
-        console.log(title);
-        console.log(`https://en.wikipedia.org/wiki/${title.replace(/ /g, "_")}`);
-        console.log(result.timestamp.slice(0, 10));
-        console.log(result.snippet);
-        console.log("");
-    });
 }
 
 let newChat = document.querySelector("#new-chat");
@@ -83,14 +140,14 @@ history.addEventListener("click", function(event){
 });
 
 let menu = document.querySelector("#menu");
-menu.addEventListener("click",function(event){
+menu.addEventListener("click", function(){
     let aside = document.querySelector("aside");
     aside.classList.toggle("ml-0");
     menu.classList.toggle("bg-[url('./x.svg')]");
 });
 
 let options = document.querySelector("#options");
-options.addEventListener("click",function(event){
+options.addEventListener("click", function(event){
     let opBtn = event.target.closest("button");
     if(opBtn){
         let opBtns = document.querySelectorAll("#options button");
@@ -102,7 +159,7 @@ options.addEventListener("click",function(event){
 });
 
 let searchBtn = document.querySelector("#search-btn");
-searchBtn.addEventListener("click", function(event){
+searchBtn.addEventListener("click", function(){
     let query = document.querySelector("#query-input").value;
     if(query == '') return;
 
@@ -110,7 +167,7 @@ searchBtn.addEventListener("click", function(event){
     container.classList.add("h-full");
 
     let section = document.querySelector(".container section");
-    section.innerHTML = "";
+    section.innerHTML = `<div class="text-[1.2rem] text-[#777] pl-[25px]">Loading...</div>`;
 
     let option = document.querySelector("#options .active").innerText;
     if(option == "Google"){
@@ -120,4 +177,12 @@ searchBtn.addEventListener("click", function(event){
     }else{
         googleGemini(query);
     }
+});
+
+let logOut = document.querySelector("#logout");
+logOut.addEventListener("click", function(){
+    users[id].status = "logged out";
+    localStorage.setItem("users", JSON.stringify(users));
+    window.location.href = './signin.html';
+    console.log("Logout");
 });

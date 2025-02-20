@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In</title>
+<link rel="stylesheet" href="output.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script async>
+    if(localStorage.getItem("users") == null){
+        localStorage.setItem("users", JSON.stringify([]));
+    }
+
+    if(JSON.parse(localStorage.getItem("users")).length > 0){
+        let users = JSON.parse(localStorage.getItem("users"));
+        let log = users.filter((ele) => {
+            return ele.status == 'logged in';
+        });
+        if(log.length > 0) window.location.href = './index.html';
+    }
+  </script>
+<style>
+    *{
+        box-sizing: border-box !important;
+    }
+
+    body{
+        margin: 0;
+        padding: 0;
+    }
+
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #2e2e2e;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #555;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #777;
+    }
+
+</style>
+</head>
+<body>
+    <main class="w-screen h-screen overflow-hidden flex items-center justify-center bg-[#212121]">
+        <form class="w-full max-w-[350px] flex p-5 box-border flex-col">
+            <h1 class="text-[40px] font-semibold text-center text-[#ECECEC] my-5">Multi Engine</h1>
+            <h2 class="text-[25px] text-[#ECECEC]">Sign In</h2>
+            <h3 class="text-[13px] text-[#ECECEC] mb-5">Kindly enter your email address and password in the fields below.</h3>
+            <input id="email" class="border-[#777] outline-none text-[#ECECEC] rounded-md px-5 py-3 mb-5 bg-[#303030]" type="email" placeholder="Email" name="email" required>
+            <input id="pass" class="border-[#777] outline-none text-[#ECECEC] rounded-md px-5 py-3 mb-5 bg-[#303030]" type="password" placeholder="Password" name="pass" required>
+            <button class="text-white outline-none rounded-md mb-5 px-5 py-3 bg-[#1e5afc]" type="submit">Sign In</button>
+            <h3 class="text-[13px] text-[#ECECEC] mb-5">Don't have account? <a href="./signup.html">Create an account</a></h3>  
+        </form>
+    </main>
+    <script>
+        let btn = document.querySelector("button");
+        btn.addEventListener("click", function(event){
+            event.preventDefault();
+            let email = document.querySelector("#email").value;
+            let pass = document.querySelector("#pass").value;
+            let status = "logged out";
+            let users = JSON.parse(localStorage.getItem("users"));
+            users.forEach(element => {
+                if(element.email == email && element.pass == pass){
+                    element.status = "logged in";
+                    status = "logged in";
+                    localStorage.setItem("users", JSON.stringify(users));
+                    window.location.href = './index.html';
+                    return;
+                }
+            });
+
+            if(status == "logged out"){
+                document.querySelector("#email").value = "";
+                document.querySelector("#pass").value = "";
+                alert("Please Enter Correct Email & Password.");
+            }
+        });
+    </script>
+</body>
+</html>

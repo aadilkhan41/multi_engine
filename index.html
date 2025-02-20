@@ -1,130 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi Engine</title>
-  <link rel="stylesheet" href="output.css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
-      *{
-        box-sizing: border-box !important;
-      }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi Engine</title>
+<link rel="stylesheet" href="output.css">
+<script async>
+    if(localStorage.getItem("users") == null){
+        localStorage.setItem("users", JSON.stringify([]));
+    }
 
-      body{
+    if(JSON.parse(localStorage.getItem("users")).length == 0){
+        window.location.href = './signup.html';
+    }else if(JSON.parse(localStorage.getItem("users")).length > 0){
+        let users = JSON.parse(localStorage.getItem("users"));
+        let log = users.filter((ele) => {
+            return ele.status == 'logged in';
+        });
+        if(log.length == 0) window.location.href = './signin.html';
+    }
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+    *{
+        box-sizing: border-box !important;
+    }
+
+    body{
         margin: 0;
         padding: 0;
-      }
+    }
 
-      ::-webkit-scrollbar {
+    ::-webkit-scrollbar {
         width: 5px;
-      }
+    }
 
-      ::-webkit-scrollbar-track {
+    ::-webkit-scrollbar-track {
         background: #2e2e2e;
         border-radius: 3px;
-      }
+    }
 
-      ::-webkit-scrollbar-thumb {
+    ::-webkit-scrollbar-thumb {
         background: #555;
-      }
+    }
 
-      ::-webkit-scrollbar-thumb:hover {
+    ::-webkit-scrollbar-thumb:hover {
         background: #777;
-      }
-  </style>
+    }
+</style>
 </head>
 <body class="text-[#ECECEC] w-screen h-screen flex">
-  <aside class="w-[270px] h-full bg-[#171717] flex flex-col transition-all duration-1000 ease-in-out -ml-[270px] md:-ml-0 absolute md:static">
-    <header class="p-[5px_10px] flex box-border justify-between">
-      <nav>
-        <button id="new-chat" class="p-6 pl-3 bg-[url('./edit.svg')] bg-no-repeat bg-[length:22px_22px] bg-[center]" type="button" title="New Chat"></button>
-      </nav>
-      <nav>
-        <button class="p-6 pl-3 bg-[url('./search.svg')] bg-no-repeat bg-[length:22px_22px] bg-[center]" type="button" title="Search"></button>
-        <button class="p-6 pl-3 bg-[url('./settings.svg')] bg-no-repeat bg-[length:22px_22px] bg-[center]" type="button" title="Settings"></button>
-        <button id="menu" class="block p-5 absolute top-[10px] ml-[90px] rounded-[10px] bg-[url('./menu.svg')] bg-no-repeat bg-[length:22px_22px] bg-center hover:bg-[#171717]; md:hidden" type="button" title="Menu"></button>  
-      </nav>
-    </header>
-    <h2 class="w-full pt-8 pl-[20px] pr-5 pb-2 box-border">History</h2>
-    <hr class="border-t border-[#212529] ml-[20px] mr-[20px]">
-    <section id="history" class="p-[15px] w-full h-full overflow-auto box-border">
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">Tailwind & CSS All Background Setup</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">Tailwind Flex Centering</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">HTML Parsing Methods</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">What is Regex</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">JavaScript Symbol Overview</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">Use Strict in JS</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">Rest Parameter Explanation</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">What is Node.js</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">CORS Error Solution</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">API Key Usage</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">Tailwind & CSS All Background Setup</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">Tailwind Flex Centering</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">HTML Parsing Methods</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">What is Regex</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">JavaScript Symbol Overview</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">Use Strict in JS</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">Rest Parameter Explanation</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">What is Node.js</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">CORS Error Solution</p>
-      <p class="w-[230px] truncate m-0 mb-1 text-sm p-2 pl-7 bg-[url('./chevron-right.svg')] bg-no-repeat bg-[length:22px_22px] bg-[5px_center] box-border rounded-lg cursor-pointer hover:bg-[#212121]">API Key Usage</p>   
-    </section>
-    <button class="p-7 pl-[55px] text-sm text-[#ECECEC] text-left bg-[url('./help-circle.svg')] bg-no-repeat bg-[length:22px_22px] bg-[20px_center]" type="button">Help</button>
-  </aside>
-  <main class="w-full h-screen bg-[#212121] flex flex-col">
-    <div class="w-full h-full box-border p-[20px_10px] flex flex-col items-center justify-center">
-      <div class="container flex flex-col w-full max-w-[800px] box-border">
-        <section class="w-full h-full overflow-y-auto mt-[40px]">
-
-
-          <!--<h1 class="w-full text-4xl font-semibold text-center mb-[20px]">What can I help with?</h1>-->
-          
-          <!--<div class="p-[15px] rounded-[10px] mb-[10px] bg-[#303030]">
-            <a href="">
-              <div class="flex items-center">
-                <span><img class="w-[30px] h-[30px] rounded-full p-[5px] bg-white" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC00lEQVR4AeWXNZgVMRSFg/vIM2DdpVqZjK3j7tDg0ODu7tLi7t5TU2E17lDS4L7JvMvkrWTluaDn+87TyH9vJob+WH2vSMuyDNcmiuVrBIsPSanwhCjC47DsKyvdp9hx1TLcC2B0sYQiEdWch0CTAHQRQI3Bmm1DAhsG7GCWolCCEUpXguW7YEoAigCkNHZT24BtmxLU6q7LKJiIJt8GQ/RVIvG1F5Q6CKq79yN/sjTXElbAqq9AEgXBhqS8d0Xz1E+Y0JFi6RNg/537KmIxArM6ASA0EYjquNkMgJb3GgK6BF5/FVQRLMWupAgfaWl4Jor4idWrD8hqFYwqwde+ecl87FXnTtBbjz2ojFa+AX0z06EmozOYqAvUoM4hbaZ0gaqkEoKl13UQ3CxIFiw1PWN4BrB8hqWmFSmbilXphShK1ZrumSwwi7fr++z7TXPO5wClwlm/AFgEO5JUFKUo7jGStetV/AAowgJeUBHOBAQo82RHDVAijg8IgIX5CQf4oYgT/msA1u6whAJADWr/3UzJ8dku18wVPbMsLM/zAbTcGww2M3qsiB1AkdMadz7sx4rYcmX1AmYAMhDdMyA+AFhgAKy8PzcC8M59i9BUxBQzgOpI9fKOgpl3XtZrBmL6hQC8c02ahpgiAfgeEwDfgq1yz+wgS6Z0LmAGylOTggHwsQ7cub0nzA9xBnScCLgZVST1DzwN3d3rQINEbvZchEKJaM61frdj1rAqvaWGaxIpkapISfdmplgcb7XKAO+clHmWoXAE1b1U0P0eRC0GAVrAk29jp606NzwrIzyKy09Ba7Vw8EOE4s/+D57EcK9FkYqY7sGMnC8e0Z16LdOzAUUrqjn3gskhIu7c8GxGsYrq7gNgSI3LKw0BwNPu3I7iJVree2wtll+BXn890/yb/Vc/5rtRIgSVSeWW4V5HNdcxOxOnaKl4oqlrS4UrhN35/mb9BDXPEHa5FJJaAAAAAElFTkSuQmCC" alt=""></span>
-                <span>
-                  <h2 class="text-[15px] font-medium pl-[10px]">letsreduce.com</h2>
-                  <h3 class="text-[12px] pl-[10px]">https://www.letsreduce.com/resize-image-to-1024x576-pixels.html</h3>
-                </span>
-              </div>
-              <h4 class="text-[#7BA3F8] py-[5px] text-[18px] font-medium">Wikipedia – Apps on Google Play</h4>
-              <p class="text-[15px]">With the official Wikipedia app, you can search and explore 40+ million articles in 300+ languages , no matter where you are.</p>
-            </a>
-          </div>-->
-
-          <!--<div class="p-[15px] rounded-[10px] mb-[10px] bg-[#303030]">
-            <a href="">
-              <div class="grid grid-cols-[80px_auto]">
-                <span class="w-[80px] h-[80px]">
-                  <img class="w-full h-full rounded-full bg-white object-cover" src="https://upload.wikimedia.org/wikipedia/commons/9/95/Salman_Khan_in_2023_%281%29_%28cropped%29.jpg" alt="">
-                </span>
-                <span>
-                  <h2 class="text-[16px] font-medium pl-[10px]">Salman Khan</h2>
-                  <h3 class="text-[15px] pl-[10px]">Salman Khan is an Indian actor and producer, known for his work in Hindi films. He made his film debut with a brief role in Biwi Ho To Aisi (1988), before</h3>
-                </span>
-              </div>
-            </a>
-          </div>-->
-          
-        </section>
-        <section class="flex flex-col pt-5">
-          <div class="flex bg-[#303030] rounded-[50px]">
-            <input id="query-input" class="w-full p-[20px_25px] box-border outline-[0] rounded-[50px] bg-[#303030] text-base" type="text" placeholder="Enter a prompt here">
-            <span class="flex items-center"><button id="search-btn" class="w-[40px] h-[40px] mr-[10px] bg-[#ECECEC] rounded-[50%] bg-[url('./search-dark.svg')] bg-no-repeat bg-[length:20px_20px] bg-[center]" type="button" title="Search"></button></span>
-          </div>
-          <div id="options" class="flex justify-center flex-wrap gap-[10px]">
-            <button class="active bg-[#303030] mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('./google.png')] bg-no-repeat bg-[length:20px_20px] bg-[10px_center] hover:bg-[#171717]" type="button">Google</button>
-            <button class="mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('./wiki.png')] bg-no-repeat bg-[length:20px_20px] bg-[10px_center] hover:bg-[#171717]" type="button" type="button">Wikipedia</button>            
-            <button class="mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('https://www.pngall.com/wp-content/uploads/16/Google-Gemini-Logo-Transparent.png')] bg-no-repeat bg-[length:25px_25px] bg-[10px_center] hover:bg-[#171717]" type="button">Gemini</button>
-          </div>
-        </section>
-      </div>
-    </div>
-  </main>
-</div>
+    <aside class="w-[270px] h-full bg-[#171717] flex flex-col transition-all duration-1000 ease-in-out -ml-[270px] md:-ml-0 absolute md:static">
+        <header class="p-[5px_10px] flex box-border justify-between">
+            <nav>
+                <button id="new-chat" class="p-6 pl-3 bg-[url('./edit.svg')] bg-no-repeat bg-[length:22px_22px] bg-[center]" type="button" title="New Chat"></button>
+            </nav>
+            <nav>
+                <button class="p-6 pl-3 bg-[url('./search.svg')] bg-no-repeat bg-[length:22px_22px] bg-[center]" type="button" title="Search"></button>
+                <button id="logout" class="p-6 pl-3 bg-[url('./log-out.svg')] bg-no-repeat bg-[length:22px_22px] bg-[center]" type="button" title="Logout"></button>
+                <button id="menu" class="block p-5 absolute top-[10px] ml-[90px] rounded-[10px] bg-[url('./menu.svg')] bg-no-repeat bg-[length:22px_22px] bg-center hover:bg-[#171717]; md:hidden" type="button" title="Menu"></button>  
+            </nav>
+        </header>
+        <h2 class="w-full pt-8 pl-[20px] pr-5 pb-2 box-border">History</h2>
+        <hr class="border-t border-[#212529] ml-[20px] mr-[20px]">
+        <section id="history" class="p-[15px] w-full h-full overflow-auto box-border"></section>
+        <button class="p-7 pl-[55px] text-sm text-[#ECECEC] text-left bg-[url('./help-circle.svg')] bg-no-repeat bg-[length:22px_22px] bg-[20px_center]" type="button">Help</button>
+    </aside>
+    <main class="w-full h-screen bg-[#212121] flex flex-col">
+        <div class="w-full h-full box-border p-[20px_10px] flex flex-col items-center justify-center">
+            <div class="container flex flex-col w-full max-w-[800px] box-border">
+                <section class="w-full h-full overflow-y-auto mt-[40px]">
+                    <h1 class="w-full text-4xl font-semibold text-center mb-[20px]">What can I help with?</h1>
+                </section>
+                <section class="flex flex-col pt-5">
+                    <div class="flex bg-[#303030] rounded-[50px]">
+                        <input id="query-input" class="w-full p-[20px_25px] box-border outline-[0] rounded-[50px] bg-[#303030] text-base" type="text" placeholder="Enter a prompt here" autocomplete="off">
+                        <span class="flex items-center"><button id="search-btn" class="w-[40px] h-[40px] mr-[10px] bg-[#ECECEC] rounded-[50%] bg-[url('./search-dark.svg')] bg-no-repeat bg-[length:20px_20px] bg-[center]" type="button" title="Search"></button></span>
+                    </div>
+                    <div id="options" class="flex justify-center flex-wrap gap-[10px]">
+                        <button class="active bg-[#303030] mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('./google.png')] bg-no-repeat bg-[length:20px_20px] bg-[10px_center] hover:bg-[#171717]" type="button">Google</button>
+                        <button class="mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('./wiki.png')] bg-no-repeat bg-[length:20px_20px] bg-[10px_center] hover:bg-[#171717]" type="button" type="button">Wikipedia</button>            
+                        <button class="mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('https://www.pngall.com/wp-content/uploads/16/Google-Gemini-Logo-Transparent.png')] bg-no-repeat bg-[length:25px_25px] bg-[10px_center] hover:bg-[#171717]" type="button">Gemini</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
 <script src="./script.js" type="module"></script>
 </body>
 </html>
