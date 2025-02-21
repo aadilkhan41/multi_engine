@@ -21,7 +21,6 @@ function renderHistory(){
 // Google Search API
 const SEARCH_API_KEY = "AIzaSyBChQKhWne8R9TdgG5yjyaB6vgQkwPTQeM";
 const CX = "16e53c083a9614b20";
-
 async function googleSearch(searchQuery){
     try{
         let res = await fetch(`https://www.googleapis.com/customsearch/v1?q=${searchQuery}&key=${SEARCH_API_KEY}&cx=${CX}`);
@@ -109,7 +108,6 @@ async function wikiSearch(query) {
 const GEMINI_API_Key = "AIzaSyADBgRwWAs-8mUSTwwNV8YKJDJ2TqWBkk4";
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
 const genAI = new GoogleGenerativeAI(GEMINI_API_Key);
-
 async function googleGemini(prompt) {
     try{
         const model = genAI.getGenerativeModel({ model: "gemini-pro"});
@@ -124,6 +122,32 @@ async function googleGemini(prompt) {
         let section = document.querySelector(".container section");
         section.innerHTML = text;
     }catch(error){
+        document.querySelector(".container section").innerHTML = `<h1 class="w-full text-[18px] font-semibold text-center mb-[20px]">There seems to be an issue. Please try again later.</h1>`;
+    }
+}
+
+// Unsplash API
+const accessToken = "AUEOLxLJlGgKmngzvkEe8E2A6GCwqbpZm6aWgw4m9WM";
+async function unsplashSearch(searchQuery){
+    searchQuery = searchQuery.toLowerCase();
+    try{
+        const response = await fetch(`https://api.unsplash.com/search/photos?page=1&query=${searchQuery}&client_id=${accessToken}`);
+        const data = await response.json();
+        let section = document.querySelector(".container section");
+        section.innerHTML = "";
+        const div = document.createElement("div");
+        div.classList.add("w-full", "grid", "gap-y-[50px]", "gap-x-[20px]", "justify-center", "px-[10px]", "box-border", "grid-cols-[repeat(auto-fit,_minmax(240px,_240px))]");
+        section.append(div);
+
+        users[id].history.push(searchQuery);
+        localStorage.setItem("users", JSON.stringify(users));
+        renderHistory();
+        
+        data.results.forEach(element => {
+            let temp = `<img class="rounded w-[240px] h-[240px] object-cover" src="${element.links.download}" alt="">`;
+            div.innerHTML += temp;
+        });
+    }catch (error) {
         document.querySelector(".container section").innerHTML = `<h1 class="w-full text-[18px] font-semibold text-center mb-[20px]">There seems to be an issue. Please try again later.</h1>`;
     }
 }
@@ -174,8 +198,10 @@ searchBtn.addEventListener("click", function(){
         googleSearch(query);
     }else if(option == "Wikipedia"){
         wikiSearch(query);
-    }else{
+    }else if(option == "Gemini"){
         googleGemini(query);
+    }else{
+        unsplashSearch(query);
     }
 });
 
@@ -186,3 +212,66 @@ logOut.addEventListener("click", function(){
     window.location.href = './signin.html';
     console.log("Logout");
 });
+
+let micBtn = document.querySelector("#mic");
+let recognition;
+let isListening = false;
+
+function initSpeechRecognition() {
+    if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+        alert("Your browser does not support Speech Recognition. Please use Chrome or Edge.");
+        return;
+    }
+
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = function (event) {
+        let transcript = "";
+        for (let i = 0; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript + " ";
+        }
+        document.querySelector("#query-input").value = transcript;
+    };
+
+    recognition.onerror = function (event) {
+        if (event.error === "no-speech") {
+            alert(`${event.error}: Please select the correct mic from chrome://settings/content/microphone`);
+        } else if (event.error === "network") {
+            alert("Network error. Check your internet connection.");
+        } else if (event.error === "audio-capture") {
+            alert("Microphone access denied. Please enable microphone permissions.");
+        } else {
+            alert("Speech recognition error: " + event.error);
+        }
+    };
+
+    recognition.onend = function () {
+        if (isListening) {
+            console.log("Restarting recognition...");
+            recognition.start();
+        } else {
+            console.log("Recognition stopped by user.");
+        }
+    };
+}
+
+function toggleSpeechRecognition() {
+    if (!recognition) {
+        initSpeechRecognition();
+    }
+
+    if (!isListening) {
+        recognition.start();
+        isListening = true;
+        micBtn.style.backgroundImage = "url('./stop.svg')";
+    } else {
+        recognition.stop();
+        isListening = false;
+        micBtn.style.backgroundImage = "url('./mic.svg')";
+    }
+}
+
+micBtn.addEventListener("click", toggleSpeechRecognition);

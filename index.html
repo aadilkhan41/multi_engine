@@ -48,6 +48,7 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #777;
     }
+
 </style>
 </head>
 <body class="text-[#ECECEC] w-screen h-screen flex">
@@ -76,12 +77,16 @@
                 <section class="flex flex-col pt-5">
                     <div class="flex bg-[#303030] rounded-[50px]">
                         <input id="query-input" class="w-full p-[20px_25px] box-border outline-[0] rounded-[50px] bg-[#303030] text-base" type="text" placeholder="Enter a prompt here" autocomplete="off">
-                        <span class="flex items-center"><button id="search-btn" class="w-[40px] h-[40px] mr-[10px] bg-[#ECECEC] rounded-[50%] bg-[url('./search-dark.svg')] bg-no-repeat bg-[length:20px_20px] bg-[center]" type="button" title="Search"></button></span>
+                        <span class="flex items-center">
+                            <button id="mic" class="w-[30px] h-[40px] mr-[10px] bg-[url('./mic.svg')] bg-no-repeat bg-[length:22px_22px] bg-[center]" title="Microphone"></button>
+                            <button id="search-btn" class="w-[40px] h-[40px] mr-[10px] bg-[#ECECEC] rounded-[50%] bg-[url('./search-dark.svg')] bg-no-repeat bg-[length:20px_20px] bg-[center]" type="button" title="Search"></button>
+                        </span>
                     </div>
                     <div id="options" class="flex justify-center flex-wrap gap-[10px]">
                         <button class="active bg-[#303030] mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('./google.png')] bg-no-repeat bg-[length:20px_20px] bg-[10px_center] hover:bg-[#171717]" type="button">Google</button>
                         <button class="mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('./wiki.png')] bg-no-repeat bg-[length:20px_20px] bg-[10px_center] hover:bg-[#171717]" type="button" type="button">Wikipedia</button>            
                         <button class="mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('https://www.pngall.com/wp-content/uploads/16/Google-Gemini-Logo-Transparent.png')] bg-no-repeat bg-[length:25px_25px] bg-[10px_center] hover:bg-[#171717]" type="button">Gemini</button>
+                        <button class="mt-4 border border-[#303030] p-[10px_20px_10px_40px] rounded-[30px] bg-[url('./unsplash.png')] bg-no-repeat bg-[length:18px_18px] bg-[10px_center] hover:bg-[#171717]" type="button">Unsplash</button>
                     </div>
                 </section>
             </div>
